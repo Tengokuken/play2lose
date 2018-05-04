@@ -1,3 +1,6 @@
+# Status:
+As it stands, play2win.py is incomplete, but the other components are complete for now and work as standalone files.
+
 # play2lose
 A program that plays Tic Tac Toe with you. You just won't be able to win.
 
