@@ -148,6 +148,7 @@ def generate_move(board, turn):
     # Else, if it isn't the first move, the computer will have to play
     # depending on the current state of the game.
     else:
+        move_over = False
         # Get the computer's symbol. The computer always plays 'X on odd turns,
         # 'O' on even turns.
         if turn % 2 == 0:
@@ -158,38 +159,74 @@ def generate_move(board, turn):
             oppo = 'O'
         # First, check if the computer has any win conditions play it if it
         # exists. If it does, then its turn is over.
-        turn_over = play_winning_move(board, move, move)
+        winning_move = play_winning_move(board, move)
+        # If winning_move is not None, place the move at that tile.
+        if winning_move is not None:
+            move_over = True
+            board.add_move(move, winning_move[0], winning_move[1])
         # If the computer does not have a winning move, then check if the
         # player has any winning moves. This is done by checking if there are
         # any win conditions for the opponent. If there is a win condition
         # for the opponent, block it.
-        oppo_win = play_winning_move(board, oppo, move)
-        # Else, you would want to set up a win or tie condition depending on
-        # the player's last move.
-        # If the player chose a corner, pick centre or another corner if centre
-        # was already taken.
-        '''
-        if ((l_row == 0 or l_row == 2) and (l_col == 0 or l_col == 2)):
-            if board.tile_is_empty(1, 1):
-                # Choose the corner.
-                board.add_move(move, 1, 1)
-            else:
-                for i in range(0, 3, 2):
-                    for j in range(0, 3, 2):
-                        try:
-                            board.add_move(move, i, j)
-                            pass
-        '''
+        if not move_over:
+            block_win = play_winning_move(board, oppo)
+            # If there is a winning move for the opponent, block it by
+            # placing you next move in that tile.
+            if block_win is not None:
+                move_over = True
+                board.add_move(move, block_win[0], block_win[1])
+        # Now, dpeending on the situation of the board, play corner, centre
+        # or side..
+        # If there the opponent has two opposite corners and the computer has
+        # centre, choose a side to block the opponent.
+        if (board.get_move(1, 1) == move and (
+            (board.get_move(0, 2) == oppo and board.get_move(
+                2, 0) == oppo) or (board.get_move(
+                    0, 0) == oppo and board.get_move(2, 2) == oppo))):
+        # Play a random unblocked side tile.
+            found_side = False
+            while found_side != False:
+                row = choice([i for i in range(0, 3) if i not in [1]])
 
-
-def play_winning_move(board, player, move_to_play):
-    '''(GameBoard, str, str) -> tuple of (int, int) or NoneType
-    Given a GameBoard object, the player who is trying to win, and the move
-    that is going to be played next, return the co-ordinates of the tile that
+def play_winning_move(board, move, player):
+    '''(TicTacToe, str, str) -> tuple of (int, int) or NoneType
+    Given a TicTacToe object, the move that is going to be played next, and
+    the player who is trying to win, return the co-ordinates of the tile that
     will lead to a win. If no win can be made from the next move, return None.
     '''
-    pass
-
+    # Clone the current board object
+    
+    # The computer will need to play their move in every open slot.
+    found_move = False    
+    move_to_play = None
+    row = 0
+    # Search the row for a winning move
+    while (not found_move and row < board.get_dimensions()[0]):
+        # Search the column for a winning move
+        col = 0
+        while (not found_move and col < board.get_dimensions()[0]):
+            # Check to see if the move can be placed in the tile
+            if not board.is_tile_empty(row, col):
+                # Place the move in that tile
+                board.add_move(move, row, col)
+                # Check if that lead to a win
+                win = board.check_winner(row, col)
+                if win:
+                    # If this was a win condition, then this is the move that
+                    # will be played next.
+                    found_move = True
+                    move_to_play = (row, col)
+                # Delete the move afterward to not make changes to the board.
+                board.delete_move(row, col)
+            col += 1
+        row += 1
+    # If by the end of this loop <found_move> is still False, then a winning
+    # move cannot be found. If there is a winning move, return the tile that
+    # the player needs to play the move.
+    if found_move:
+        move_to_play = (row, col)
+    # Return the winning move.
+    return move_to_play
 if (__name__ == "__main__"):
     print('---PLAY THE GAME---')
     x = TicTacToe()

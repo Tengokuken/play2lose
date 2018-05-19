@@ -38,8 +38,8 @@ class TicTacToe(GameBoard):
         # Create the TicTacToe object, a GameBoard object with dimensions 3x3.
         super().__init__(3, 3)
 
-    def check_winner(self, recent_move):
-        '''(TicTacToe, tuple of (int, int)) -> bool
+    def check_winner(self, row, col):
+        '''(TicTacToe, int, int) -> bool
         Check if there is a winner of the Tic Tac Toe game. This method
         overwrites the check_winner() supermethod in GameBoard.
         '''
@@ -49,14 +49,14 @@ class TicTacToe(GameBoard):
         win_cond = [True, True, True, True]
         i = 0
         # Get the value of the move in the most recent tile.
-        played_move = self._board[recent_move[0]][recent_move[1]]
+        played_move = self._board[row][col]
         # Depending on the recent move, check surrounding tiles to see if
         # a win has occured.
         # First, check along the row to see if there is a win
         while (win_cond[0] and i < self.get_dimensions()[0]):
             # If the move on the ith column at the given row is not the same as
             # the value of the most recent move, check other win cond.
-            if (self._board[recent_move[0]][i] != played_move):
+            if (self._board[row][i] != played_move):
                 win_cond[0] = False
             # Increment counter
             i += 1
@@ -68,12 +68,12 @@ class TicTacToe(GameBoard):
                     )[1]):
             # If the move on the ith row at the given column is not the
             # same as the value of the most recent move, check other win cond.
-            if (self._board[i][recent_move[1]] != played_move):
+            if (self._board[i][col] != played_move):
                 win_cond[1] = False
             i += 1
         # If the move was placed on the center or top left diagonal, check
         # the tiles on the top left diagonal.
-        if (any(win_cond) and (recent_move[0] == recent_move[1])):
+        if (any(win_cond) and (row == col)):
             i = 0
             while (win_cond[2] and i < self.get_dimensions()[0]):
                 # If the move on the ith row and column is not the same as
@@ -84,13 +84,10 @@ class TicTacToe(GameBoard):
         # If the game hasn't ended and the move was placed on the top right
         # diagonal or center, check the top right diagonal.
         # It is on the top right diagonal if the absolute difference is 2 or
-        # if <recent_move[0]> and <recent_move[1]> both are 2.
+        # if <row> and <col> both are 2.
         i = 0
-        if (any(
-            win_cond) and ((((
-                recent_move[0] - recent_move[
-                    1]) ** 2) ** 0.5) == 2 or (
-                        recent_move[0] == 2 and recent_move[1] == 2))):
+        if (any(win_cond) and ((((row - col) ** 2) ** 0.5) == 2 or (
+                row == 2 and col == 2))):
             i = 0
             while (win_cond[3] and i < self.get_dimensions()[0]):
                 # If the move on the ith row and the 3-ith column is not the
@@ -134,7 +131,7 @@ def play_TTT(board, turn):
         # The player is the 'X' player. Enter their move into the board.
         move = 'X'
     print("TURN " + str(turn) + ":")
-    (row, column) = [
+    (row, col) = [
         int(x) for x in input(
             "Enter two numbers that represent the tile you want to make your" +
             " move on, " + move + " (ie '1, 2'): ").split(',')]
@@ -143,12 +140,12 @@ def play_TTT(board, turn):
         # Return an error
         raise TileError("You have entered an invalid space.")
     else:
-        board.add_move(move, row, column)
+        board.add_move(move, row, col)
         print(board)
         # Check the board to see if there is a game ended using the most recent
         # move. The game can only end if 5 or more moves have been made.
         if turn >= 5:
-            game_ended = board.check_winner((row, column))
+            game_ended = board.check_winner(row, col)
         # If the game has not ended (either there are more turns to play or
         # the game didn't end from that turn)
         if not (game_ended or turn == 9):
