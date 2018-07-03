@@ -133,8 +133,10 @@ def play_TTT(board, turn):
     print("TURN " + str(turn) + ":")
     (row, col) = [
         int(x) for x in input(
-            "Enter two numbers that represent the tile you want to make your" +
-            " move on, " + move + " (ie '1, 2'): ").split(',')]
+            "Enter two numbers that represent the tile you want\n to make" +
+            " you move on, " + move + " (ie '1, 2'): ").split(',')]
+    row  = row - 1
+    col = col - 1
     # Check to see if the input is within the dimensions of the board
     if ((row < 0 or row > 2) or (col < 0 or col > 2)):
         # Return an error

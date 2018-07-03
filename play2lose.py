@@ -87,7 +87,7 @@ def play_losing_game(board, player, turn):
                 "Enter two numbers that represent the tile you want to" +
                 " make your move on, " + move + " (ie '1, 2'): ").split(',')]
         # Check to see if the input is within the dimensions of the board
-        if ((row < 0 or row > 2) or (col < 0 or col > 2)):
+        if ((row < 0 or row > 2) or (column < 0 or column > 2)):
             # Return an error
             raise TileError("You have entered an invalid space.")
         else:
@@ -99,7 +99,7 @@ def play_losing_game(board, player, turn):
     # Else if it the computer's turn, calculate their move.
     if player == 'C':
         # Run the algorithm for the computer's turn.
-        generate_move(board, turn, row, column)
+        generate_move(board, turn)
         # Check the board to see if there is a game ended using the most recent
         # move. The game can only end if 5 or more moves have been made.
         if turn >= 5:
@@ -195,29 +195,29 @@ def play_winning_move(board, move, player):
     will lead to a win. If no win can be made from the next move, return None.
     '''
     # Clone the current board object
-    
+    new_board = copy.deepcopy(board)
     # The computer will need to play their move in every open slot.
     found_move = False    
     move_to_play = None
     row = 0
     # Search the row for a winning move
-    while (not found_move and row < board.get_dimensions()[0]):
+    while (not found_move and row < new_board.get_dimensions()[0]):
         # Search the column for a winning move
         col = 0
-        while (not found_move and col < board.get_dimensions()[0]):
+        while (not found_move and col < new_board.get_dimensions()[0]):
             # Check to see if the move can be placed in the tile
-            if not board.is_tile_empty(row, col):
+            if not new_board.is_tile_empty(row, col):
                 # Place the move in that tile
-                board.add_move(move, row, col)
+                new_board.add_move(move, row, col)
                 # Check if that lead to a win
-                win = board.check_winner(row, col)
+                win = new_board.check_winner(row, col)
                 if win:
                     # If this was a win condition, then this is the move that
                     # will be played next.
                     found_move = True
                     move_to_play = (row, col)
                 # Delete the move afterward to not make changes to the board.
-                board.delete_move(row, col)
+                new_board.delete_move(row, col)
             col += 1
         row += 1
     # If by the end of this loop <found_move> is still False, then a winning
@@ -227,6 +227,7 @@ def play_winning_move(board, move, player):
         move_to_play = (row, col)
     # Return the winning move.
     return move_to_play
+
 if (__name__ == "__main__"):
     print('---PLAY THE GAME---')
     x = TicTacToe()
