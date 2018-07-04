@@ -106,7 +106,7 @@ class GameBoard(ABC):
         if (row > self._height and column > self._length):
             raise TileError("That tile does not exist.")
         # If the tile has already has a move, raise a TileError.
-        if(len(self._board[row][column]) != 0):
+        elif(len(self._board[row][column]) != 0):
             raise TileError("This tile already has a move.")
         # Else it is not empty, add the move to that tile.
         else:

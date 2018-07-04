@@ -121,6 +121,7 @@ def play_TTT(board, turn):
     Play a game of Tic Tac Toe.
     '''
     game_ended = False
+    turn_ended = False
     # Check to see if the player was the first player.
     # If <turn> is odd, then the player was the first player. If <turn> is
     # even, then the player is not the first player.
@@ -131,35 +132,49 @@ def play_TTT(board, turn):
         # The player is the 'X' player. Enter their move into the board.
         move = 'X'
     print("TURN " + str(turn) + ":")
-    (row, col) = [
-        int(x) for x in input(
-            "Enter two numbers that represent the tile you want\n to make" +
-            " you move on, " + move + " (ie '1, 2'): ").split(',')]
-    row  = row - 1
-    col = col - 1
-    # Check to see if the input is within the dimensions of the board
-    if ((row < 0 or row > 2) or (col < 0 or col > 2)):
-        # Return an error
-        raise TileError("You have entered an invalid space.")
-    else:
-        board.add_move(move, row, col)
-        print(board)
-        # Check the board to see if there is a game ended using the most recent
-        # move. The game can only end if 5 or more moves have been made.
-        if turn >= 5:
-            game_ended = board.check_winner(row, col)
-        # If the game has not ended (either there are more turns to play or
-        # the game didn't end from that turn)
-        if not (game_ended or turn == 9):
-            # Run the function again, but switch turns to the computer
-            # and increment 1 to <turn>
-            play_TTT(board, turn + 1)
-        # Else if there was a winner, display the player's symbol ('X' or 'O')
-        else:
-            if turn == 9:
-                print('There is no winner!')
+    while (not turn_ended):
+        bad_input = True        
+        while (bad_input):
+            try:
+                (row, col) = [
+                    int(x) for x in input(
+                        "Enter two numbers that represent the tile you want\nto make"
+                         + " your move on, " + move + " (ie '1, 2'): ").split(',')]
+            except:
+                print("Bad input, please try again.\n")
             else:
-                print('The winner is ' + move + '! \n')
+                bad_input = False
+                row = row - 1
+                col = col - 1
+        # Check to see if the input is within the dimensions of the board
+        if ((row < 0 or row > 2) or (col < 0 or col > 2)):
+            # Return an error
+            print(TileError("You have entered an invalid space. Please try again.\n"))
+        else:
+            # Check if we can add the move
+            try:
+                board.add_move(move, row, col)
+            except:
+                print(TileError("This tile already has a move.\n"))
+            else:
+                turn_ended = True
+                print(board)
+                # Check the board to see if there is a game ended using the most recent
+                # move. The game can only end if 5 or more moves have been made.
+                if turn >= 5:
+                    game_ended = board.check_winner(row, col)
+                # If the game has not ended (either there are more turns to play or
+                # the game didn't end from that turn)
+                if not (game_ended or turn == 9):
+                    # Run the function again, but switch turns to the computer
+                    # and increment 1 to <turn>
+                    play_TTT(board, turn + 1)
+                # Else if there was a winner, display the player's symbol ('X' or 'O')
+                else:
+                    if turn == 9:
+                        print('There is no winner!')
+                    else:
+                        print('The winner is ' + move + '! \n')
 
 if(__name__ == '__main__'):
     while(True):
